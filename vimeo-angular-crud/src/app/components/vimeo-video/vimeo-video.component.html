@@ -1,0 +1,16 @@
+<div class="container-fluid m-1 mt-3">
+  <div class="row" *ngIf="videoList">
+    <div class="col-2" *ngFor="let item of videoList">
+      <div class="row">
+        <div class="video-container" [innerHTML]="item.embed.html"></div>
+      </div>
+      <div class="row justify-content-center">
+        <p class="col-12 text-center">{{ item.name }}</p>
+        <button mat-raised-button color="warn" (click)="deleteVideo(item.uri)">Delete</button>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="!videoList">
+    <p class="w-100 text-center">No Video!!! <a href="/upload">Upload Video</a></p>
+  </div>
+</div>

@@ -33,7 +33,7 @@ export class UploadVideoComponent implements OnInit {
     // tslint:disable-next-line:max-line-length
     this.vimeoControl.vimeoUpload(this.uploadedFiles[0], this.getFormValue('vimeoVideoName'), this.getFormValue('vimeoVideoDescription')).
     subscribe(res => {
-      this.snackBar.open('success!!! Your video URI- https://www.vimeo.com' + res.videoUri, 'close');
+      this.snackBar.open('success!!! Your video URI- https://www.vimeo.com' + res.data.createVideo.response, 'close');
       this.uploading = false;
       this.vimeoUploadForm.reset();
     });

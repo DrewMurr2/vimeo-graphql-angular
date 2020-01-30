@@ -2,7 +2,7 @@
   <div class="row" *ngIf="videoList">
     <div class="col-2" *ngFor="let item of videoList">
       <div class="row">
-        <div class="video-container" [innerHTML]="item.embed.html"></div>
+        <div class="video-container" [innerHTML]="item.embed.html | safe: 'html'"></div>
       </div>
       <div class="row justify-content-center">
         <p class="col-12 text-center">{{ item.name }}</p>

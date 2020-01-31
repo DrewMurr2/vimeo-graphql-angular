@@ -4,14 +4,12 @@ var ACCESS_TOKEN = 'c4cc0f251eed8d22bb65d0741477321b';
 var Vimeo = require('vimeo').Vimeo;
 var client = new Vimeo(CLIENT_ID, CLIENT_SECRET, ACCESS_TOKEN);
 var fs = require('fs');
-const uploadDir = '../uploads';
+const uploadDir = './uploads';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-
 const storeFS = ({ stream, filename }) => {
-
   const path = `${uploadDir}/${filename}`;
   return new Promise((resolve, reject) =>
     stream
@@ -54,6 +52,33 @@ const createVideo = async(args) => {
     );
   });
 }
+
+const updateVideo = async(args) => {
+  const { videoURI } = args;
+  const { filename, mimetype, createReadStream } = await args.file;
+  const stream = createReadStream();
+  const pathObj = await storeFS({ stream, filename });
+  const fileLocation = pathObj.path;
+  return new Promise(function(resolve, reject) {
+    client.replace(
+      fileLocation,
+      videoURI,
+      function(uri) {
+        fs.unlinkSync(fileLocation);
+        console.log('File upload completed. Your Vimeo URI is:', uri)
+        resolve({ response: uri });
+      },
+      function(bytesUploaded, bytesTotal) {
+        var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+        console.log("progress in", percentage);
+      },
+      function(error) {
+        reject({ respose: error });
+      }
+    );
+  });
+}
+
 const getVideoList = async() => {
   return new Promise(function(resolve, reject) {
     client.request({
@@ -98,6 +123,7 @@ module.exports = {
   },
   Mutation: {
     createVideo: (_, { file, videoName, videoDescription }) => { return createVideo({ file, videoName, videoDescription }).then(res => { return res; }) },
-    deleteVideo: (_, { videoURI }) => { return deleteVideo({ uri: videoURI }).then(res => { return res; }) }
+    deleteVideo: (_, { videoURI }) => { return deleteVideo({ uri: videoURI }).then(res => { return res; }) },
+    updateVideo: (_, { file, videoURI }) => { return updateVideo({ file, videoURI }).then(res => { return res; }) }
   }
 };

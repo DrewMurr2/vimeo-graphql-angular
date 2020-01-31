@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {VimeoManage} from '../../service/vimeoservice.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { map } from 'rxjs/operators';
@@ -8,14 +8,42 @@ import { map } from 'rxjs/operators';
   templateUrl: './vimeo-video.component.html',
   styleUrls: ['./vimeo-video.component.scss']
 })
-
-
 export class VimeoVideoComponent implements OnInit {
+  @ViewChild('vimeoUpload', {static: false}) fileInputRef: ElementRef;
   videoList = '';
+  uploading = false;
+  uploadedFiles: Array < File > ;
+  selectedVideoURI = '';
   constructor(private vimeoControl: VimeoManage, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.getVideoList();
+  }
+
+  selectFile(event): void {
+    this.uploadedFiles = event.target.files;
+    if (this.checkAllowedType(this.uploadedFiles[0].type)) {
+      this.uploading = true;
+      this.updateVideo();
+    } else {
+      this.snackBar.open('file type error', 'close');
+    }
+  }
+
+  openFileDialog(uri) {
+    this.selectedVideoURI = uri;
+    this.fileInputRef.nativeElement.click();
+  }
+  // update Video
+  updateVideo() {
+    // tslint:disable-next-line:max-line-length
+    this.vimeoControl.updateVideo(this.uploadedFiles[0], this.selectedVideoURI).
+    subscribe(res => {
+      this.snackBar.open('update success!!! Your video URI- https://www.vimeo.com' + res.data.updateVideo.response, 'close');
+      this.uploading = false;
+      this.selectedVideoURI = '';
+      this.getVideoList();
+    });
   }
   // deleting video
   deleteVideo(uri) {
@@ -38,4 +66,9 @@ export class VimeoVideoComponent implements OnInit {
     });
   }
 
+  checkAllowedType(filetype: string): boolean {
+    const allowed = ['mov', 'wmv', 'avi', 'flv', 'mp4'];
+    const videoType = filetype.split('/').pop();
+    return allowed.includes(videoType);
+  }
 }

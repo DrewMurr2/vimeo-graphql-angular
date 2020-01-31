@@ -45,6 +45,28 @@ export class VimeoManage {
         map(res => res)
       );
   }
+  updateVideo(file: File, uri): Observable<any> {
+    // tslint:disable-next-line:prefer-const
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation updateVideo($file: Upload!, $uri: ID) {
+          updateVideo(file: $file, videoURI: $uri) {
+            response
+          }
+        }
+      `,
+      variables: {
+        file,
+        uri
+      },
+      context: {
+         useMultipart: true
+      },
+      refetchQueries: [{query: this.videoListQuery}]
+    }).pipe(
+        map(res => res)
+      );
+  }
   // getting video list service
   getVideoList(): Observable<any> {
     return this.apollo.watchQuery({

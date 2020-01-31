@@ -73,6 +73,7 @@ const typeDefs = gql `
   type Mutation {
     createVideo(file: Upload!, videoName: String!, videoDescription: String! ): Response #video URI
     deleteVideo(videoURI: ID) : Response
+    updateVideo(file: Upload!, videoURI: ID) : Response
   }
 `
 module.exports = typeDefs;

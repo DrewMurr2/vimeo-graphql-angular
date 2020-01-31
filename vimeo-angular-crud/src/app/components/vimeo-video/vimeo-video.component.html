@@ -1,12 +1,17 @@
 <div class="container-fluid m-1 mt-3">
+  <input type="file" name="vimeofile" (change)="selectFile($event)" #vimeoUpload style="display: none;">
   <div class="row" *ngIf="videoList">
     <div class="col-2" *ngFor="let item of videoList">
       <div class="row">
-        <div class="video-container" [innerHTML]="item.embed.html | safe: 'html'"></div>
+        <div *ngIf="uploading && selectedVideoURI == item.uri" class="video-container text-center">
+          Updating...
+        </div>
+        <div *ngIf="!uploading || selectedVideoURI != item.uri" class="video-container" [innerHTML]="item.embed.html | safe: 'html'"></div>
       </div>
       <div class="row justify-content-center">
         <p class="col-12 text-center">{{ item.name }}</p>
-        <button mat-raised-button color="warn" (click)="deleteVideo(item.uri)">Delete</button>
+        <button mat-raised-button color="primary" [disabled]="uploading" class="mr-2" (click)="openFileDialog(item.uri)">Update</button>
+        <button mat-raised-button color="warn" [disabled]="uploading" (click)="deleteVideo(item.uri)">Delete</button>
       </div>
     </div>
   </div>
